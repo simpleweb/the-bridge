@@ -5,14 +5,17 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "APP_ENV=development yarn run watch",
+    "start": "APP_ENV=development npm run watch",
     "start:prod": "NODE_ENV=production pm2-runtime --env production pm2.config.js",
     "prettier": "./node_modules/prettier/bin/prettier.js",
     "prettierAll": "./node_modules/prettier/bin/prettier.js \\*\\*/\\*.js \\*\\*/\\*.json",
-    "watch": "nodemon ./server.js"
+    "watch": "npx nodemon ./server.js"
   },
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": "^10.0.0"
+  },
   "dependencies": {
     "dotenv": "^4.0.0",
     "ejs": "^2.5.7",
@@ -28,9 +31,6 @@
   "devDependencies": {
     "concurrently": "^3.5.0",
     "faker": "^4.1.0",
-    "gulp": "^3.9.1",
-    "gulp-clean": "^0.3.2",
-    "gulp-rev": "^8.0.0",
     "jest": "^21.2.1",
     "nock": "^9.1.0",
     "nodemon": "^1.12.1",
