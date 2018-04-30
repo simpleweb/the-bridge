@@ -3,7 +3,7 @@ var Crawler = require("simplecrawler"),
     cheerio = require("cheerio"),
     request = require("request");
 
-var crawler = new Crawler('https://mbasic.facebook.com/friends/center/friends/');
+var crawler = new Crawler('https://mbasic.facebook.com/friends/center/friends/')
 
 crawler.maxDepth = 1
 crawler.respectRobotsTxt = false
@@ -57,21 +57,7 @@ var login = function(error, response, body) {
     console.log("START CRAWL")
   });
 
-  crawler.on("fetchcomplete", function(queueItem, responseBuffer, response) {
-    // console.log("I just received %s (%d bytes)", queueItem.url, responseBuffer.length);
-    // console.log('The content of the page: ' + responseBuffer.toString());
-  });
-
   crawler.on('complete', function() {
-    console.log('FINISHED CRAWL');
-  });
-
-  crawler.cookies.on('addcookie', function(cookie) {
-    // console.log('Cookie added: ' + cookie);
-  });
-
-  crawler.on('fetchstart', function(queueItem, requestOptions) {
-    // console.log('Queue Item: ' + queueItem.url);
-    //console.log('Request Options: ' + requestOptions);
+    console.log('FINISHED CRAWL')
   });
 };
