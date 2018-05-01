@@ -14,7 +14,9 @@ crawler.on("complete", () => {
   console.log("Complete");
 });
 crawler.on("fetchcomplete", (queueItem, responseBuffer, response) => {
-  console.log("Fetched", queueItem.url);
+  if (queueItem.path.match(/[a-zA-Z]+\?fref=hovercard/)) {
+    console.log("Fetched", queueItem.url);
+  }
 });
 
 // only fetch friend hovercards and profiles (do not load more friends or posts)
