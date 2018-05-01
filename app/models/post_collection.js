@@ -1,4 +1,4 @@
-const cheerio = require("cheerio");
+const $ = require("cheerio");
 
 const postCollection = class PostCollection {
   constructor() {
@@ -11,8 +11,31 @@ const postCollection = class PostCollection {
     });
   }
 
-  addPosts(posts) {
-    this.store.push(posts);
+  addPosts(name, articles) {
+    let postStore = this.store;
+
+    articles.each(function(i, elem) {
+      let user = $(elem)
+        .find('h3 a')
+        .first()
+        .text();
+
+      if (name !== user) {
+        user = user + ' (with ' + name + ')'
+      }
+
+      // TODO: Use helper to parse timestamp
+      const timestamp = $(elem).find('abbr').text();
+      const content = $(elem).find('p').text();
+
+      // TODO Add JSON to model
+      postStore.push({
+        'user': user,
+        'content': content,
+        'timestamp': timestamp
+      });
+    });
+
     this.sort(this.store);
   }
 

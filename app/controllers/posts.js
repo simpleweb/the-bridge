@@ -22,24 +22,19 @@ crawler.on("fetchcomplete", (queueItem, responseBuffer, response) => {
     const $ = cheerio.load(responseBuffer.toString());
 
     var articles = $('#recent');
+    var name = $('.bm').text();
     
-    while (articles.length <= 1) {
+    // TODO: FInd more robust way of getting this.
+    while (articles.length == 5) {
       articles = articles.children();
     }
 
-    const posts = [];
+    const posts = new PostCollection();
 
-    articles.each(function(i, elem) {
-      const timestamp = $(elem).find('abbr').text();
-      const content = $(elem).find('p').text();
+    posts.addPosts(name, articles);
 
-      posts.push({
-        'content': content,
-        'timestamp': timestamp
-      });
-    });
-
-    console.log("Fetched", queueItem.url);
+    posts.renderPosts();
+    //console.log("Fetched", queueItem.url);
   }
 });
 
