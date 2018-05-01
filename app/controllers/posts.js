@@ -5,8 +5,24 @@ var Crawler = require("simplecrawler"),
 
 var crawler = new Crawler('https://mbasic.facebook.com/friends/center/friends/')
 
-crawler.maxDepth = 1
+// crawler.maxDepth = 0
 crawler.respectRobotsTxt = false
+crawler.on("crawlstart", () => {
+  console.log("Start");
+});
+crawler.on("complete", () => {
+  console.log("Complete");
+});
+crawler.on("fetchcomplete", (queueItem, responseBuffer, response) => {
+  console.log("Fetched", queueItem.url);
+});
+
+// only fetch friend hovercards and profiles (do not load more friends or posts)
+crawler.addFetchCondition( (queueItem, referrerQueueItem, callback) => {
+  hovercard = queueItem.uriPath === '/friends/hovercard/mbasic/'
+  profile = queueItem.path.match(/[a-zA-Z]+\?fref=hovercard/) !== null
+  callback(null, hovercard || profile);
+});
 
 exports.index = async (req, res, next) => {
   request('https://mbasic.facebook.com/login.php', {
@@ -23,15 +39,16 @@ exports.index = async (req, res, next) => {
   }
 };
 
-var login = function(error, response, body) {
+var login = (error, response, body) => {
+  console.log('login', error)
+
   var $ = cheerio.load(body)
   var formDefaults = {}
   var loginInputs = $("input")
 
-  loginInputs.each(function(i, input) {
+  loginInputs.each( (i, input) => {
     var inputName = $(input).attr("name")
     var inputValue = $(input).val()
-
     formDefaults[inputName] = inputValue;
   });
 
@@ -42,22 +59,14 @@ var login = function(error, response, body) {
     }),
     headers: {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36'},
     jar: true
-  }, function(error, response, body) {
+  }, (error, response, body) => {
     // change the domain the cookies apply to to mbasic.facebook.com rather than .facebook.com
     // otherwise simplecrawler does not add the cookies to the requests sent to mbasic.facebook.com
-    parsedCookieHeaders = response.headers["set-cookie"].map( i=> {
+    parsedCookieHeaders = response.headers["set-cookie"].map( i => {
       return i.replace('.facebook.com', 'mbasic.facebook.com')
     })
     crawler.cookies.addFromHeaders(parsedCookieHeaders);
 
     crawler.start();
-  });
-
-  crawler.on('crawlstart', function () {
-    console.log("START CRAWL")
-  });
-
-  crawler.on('complete', function() {
-    console.log('FINISHED CRAWL')
   });
 };
