@@ -1,3 +1,6 @@
+_crawlTracker = require('../helpers/crawlTracker')
+crawlTracker = new _crawlTracker
+
 var Crawler = require("simplecrawler"),
     url = require("url"),
     cheerio = require("cheerio"),
@@ -5,7 +8,6 @@ var Crawler = require("simplecrawler"),
 
 var crawler = new Crawler('https://mbasic.facebook.com/friends/center/friends/')
 
-// crawler.maxDepth = 0
 crawler.respectRobotsTxt = false
 crawler.on("crawlstart", () => {
   console.log("Start");
@@ -13,17 +15,26 @@ crawler.on("crawlstart", () => {
 crawler.on("complete", () => {
   console.log("Complete");
 });
+// record a new page of friends has been loaded
+crawler.on("queueadd", (queueItem, referrerQueueItem) => {
+  if (queueItem.uriPath === '/friends/center/friends/') {
+    crawlTracker.loadedMoreFriends()
+  }
+})
+// handle a profile fetched
 crawler.on("fetchcomplete", (queueItem, responseBuffer, response) => {
-  if (queueItem.path.match(/[a-zA-Z]+\?fref=hovercard/)) {
+  if (queueItem.path.match(/[a-zA-Z.0-9?=&]+fref=hovercard/)) {
     console.log("Fetched", queueItem.url);
   }
 });
 
-// only fetch friend hovercards and profiles (do not load more friends or posts)
+// only fetch friend hovercards and profiles and load more friends
 crawler.addFetchCondition( (queueItem, referrerQueueItem, callback) => {
   hovercard = queueItem.uriPath === '/friends/hovercard/mbasic/'
-  profile = queueItem.path.match(/[a-zA-Z]+\?fref=hovercard/) !== null
-  callback(null, hovercard || profile);
+  profile = queueItem.path.match(/[a-zA-Z.0-9?=&]+fref=hovercard/) !== null
+  loadMoreFriends = (queueItem.uriPath === '/friends/center/friends/') && (!crawlTracker.atFriendsLoadedLimit())
+
+  callback(null, hovercard || profile || loadMoreFriends);
 });
 
 exports.index = async (req, res, next) => {
@@ -42,8 +53,6 @@ exports.index = async (req, res, next) => {
 };
 
 var login = (error, response, body) => {
-  console.log('login', error)
-
   var $ = cheerio.load(body)
   var formDefaults = {}
   var loginInputs = $("input")
