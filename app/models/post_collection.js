@@ -21,7 +21,7 @@ const postCollection = class PostCollection {
         .text();
 
       if (name !== user) {
-        user = user + ' (with ' + name + ')'
+        user = user + ' (w/ ' + name + ')'
       }
 
       // TODO: Use helper to parse timestamp

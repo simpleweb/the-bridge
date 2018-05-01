@@ -15,7 +15,10 @@ crawler.on("crawlstart", () => {
 
 crawler.on("complete", () => {
   console.log("Complete");
+  posts.renderPosts();
 });
+
+const posts = new PostCollection();
 
 crawler.on("fetchcomplete", (queueItem, responseBuffer, response) => {
   if (queueItem.path.match(/[a-zA-Z]+\?fref=hovercard/)) {
@@ -25,15 +28,11 @@ crawler.on("fetchcomplete", (queueItem, responseBuffer, response) => {
     var name = $('.bm').text();
     
     // TODO: FInd more robust way of getting this.
-    while (articles.length == 5) {
+    while (articles.length !== 5) {
       articles = articles.children();
     }
 
-    const posts = new PostCollection();
-
     posts.addPosts(name, articles);
-
-    posts.renderPosts();
     //console.log("Fetched", queueItem.url);
   }
 });
