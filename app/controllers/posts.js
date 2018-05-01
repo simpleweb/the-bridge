@@ -1,20 +1,44 @@
 var Crawler = require("simplecrawler"),
     url = require("url"),
     cheerio = require("cheerio"),
-    request = require("request");
+    request = require("request"),
+    PostCollection = require('../models/post_collection')
 
 var crawler = new Crawler('https://mbasic.facebook.com/friends/center/friends/')
 
 // crawler.maxDepth = 0
 crawler.respectRobotsTxt = false
+
 crawler.on("crawlstart", () => {
   console.log("Start");
 });
+
 crawler.on("complete", () => {
   console.log("Complete");
 });
+
 crawler.on("fetchcomplete", (queueItem, responseBuffer, response) => {
   if (queueItem.path.match(/[a-zA-Z]+\?fref=hovercard/)) {
+    const $ = cheerio.load(responseBuffer.toString());
+
+    var articles = $('#recent');
+    
+    while (articles.length <= 1) {
+      articles = articles.children();
+    }
+
+    const posts = [];
+
+    articles.each(function(i, elem) {
+      const timestamp = $(elem).find('abbr').text();
+      const content = $(elem).find('p').text();
+
+      posts.push({
+        'content': content,
+        'timestamp': timestamp
+      });
+    });
+
     console.log("Fetched", queueItem.url);
   }
 });
