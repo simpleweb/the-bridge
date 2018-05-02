@@ -1,4 +1,4 @@
-const $ = require("cheerio");
+const Post = require('../models/post');
 
 const postCollection = class PostCollection {
   constructor() {
@@ -15,32 +15,14 @@ const postCollection = class PostCollection {
     let postStore = this.store;
 
     articles.each(function(i, elem) {
-      let user = $(elem)
-        .find('h3 a')
-        .first()
-        .text();
-
-      if (name !== user) {
-        user = user + ' (w/ ' + name + ')'
-      }
-
-      // TODO: Use helper to parse timestamp
-      const timestamp = $(elem).find('abbr').text();
-      const content = $(elem).find('p').text();
-
-      // TODO Add JSON to model
-      postStore.push({
-        'user': user,
-        'content': content,
-        'timestamp': timestamp
-      });
+      postStore.push(new Post(name, elem));
     });
 
     this.sort(this.store);
   }
 
-  renderPosts() {
-    console.log('Items in collection: ' + JSON.stringify(this.store));
+  renderPosts() {    
+    console.log(JSON.stringify(this.store));
   }
 };
 

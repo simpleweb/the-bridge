@@ -33,7 +33,6 @@ crawler.on("fetchcomplete", (queueItem, responseBuffer, response) => {
     }
 
     posts.addPosts(name, articles);
-    //console.log("Fetched", queueItem.url);
   }
 });
 
