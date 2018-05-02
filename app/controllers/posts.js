@@ -1,8 +1,9 @@
 _crawlHelper = require('../helpers/crawlHelper')
-crawlHelper = new _crawlHelper
 
 exports.index = async (req, res, next) => {
   try {
+    var crawlHelper = new _crawlHelper
+
     await crawlHelper.login()
 
     crawlHelper.crawler.on("complete", () => {
