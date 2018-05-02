@@ -10,6 +10,7 @@ const postCollection = class PostCollection {
     return array.sort(function(a, b) {
       return new Date(b.timestamp) - new Date(a.timestamp);
     });
+    return this.store;
   }
 
   addPosts(name, articles) {
@@ -20,7 +21,7 @@ const postCollection = class PostCollection {
     });
   }
 
-  renderPosts() {    
+  renderPosts() {
     console.log(JSON.stringify(this.store));
   }
 };
