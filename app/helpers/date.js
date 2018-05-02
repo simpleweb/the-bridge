@@ -5,7 +5,7 @@ exports.convertFacebookDate = (dateStr) => {
   const isRelative = false;
 
   if (dateStr.includes("ago")) {
-    isRelative = true
+    isRelative = true;
   }
 
   if (isRelative) {
