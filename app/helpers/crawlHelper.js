@@ -27,6 +27,7 @@ const crawlHelper= class CrawlHelper {
 
   setupCrawler() {
     this._crawler.respectRobotsTxt = false
+    this._crawler.maxConcurrency = 5;
 
     this._crawler.on("crawlstart", () => {
       console.log("start")
@@ -129,9 +130,10 @@ const crawlHelper= class CrawlHelper {
       var loggedInResponse = await request(logInOptions);
       return loggedInResponse.response
     } catch(error) {
-      if (error.response.statusCode === 302) {
+      if (error.response && error.response.statusCode === 302) {
         return error.response
       } else {
+        console.log(error)
         throw error
       }
     }
