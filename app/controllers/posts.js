@@ -1,3 +1,6 @@
+_crawlTracker = require('../helpers/crawlTracker')
+crawlTracker = new _crawlTracker
+
 var Crawler = require("simplecrawler"),
     url = require("url"),
     cheerio = require("cheerio"),
@@ -5,26 +8,57 @@ var Crawler = require("simplecrawler"),
 
 var crawler = new Crawler('https://mbasic.facebook.com/friends/center/friends/')
 
-// crawler.maxDepth = 0
 crawler.respectRobotsTxt = false
+
+crawler.discoverResources = (buffer, queueItem) => {
+  $ = cheerio.load(buffer.toString("utf8"));
+
+  timestamps = $('span').filter(function()  {
+    return $(this).text().trim().match(/Like.+React/) !== null;
+  }).map(function() {
+    return $(this).parent().prev().find('abbr');
+  })
+
+  if (timestamps.length > 0) {
+    // TO DO: ignore links if the final post on the page was sent earlier than the time from which we want to check more recent posts
+    console.log(dates.last().text())
+  }
+
+  return $("a[href]").map(function () {
+    return $(this).attr("href");
+  }).get();
+};
+
 crawler.on("crawlstart", () => {
   console.log("Start");
 });
 crawler.on("complete", () => {
   console.log("Complete");
 });
+
+// record a new page of friends has been loaded
+crawler.on("queueadd", (queueItem, referrerQueueItem) => {
+  if (queueItem.uriPath === '/friends/center/friends/') {
+    crawlTracker.loadedMoreFriends()
+  }
+})
+// handle a profile fetched
 crawler.on("fetchcomplete", (queueItem, responseBuffer, response) => {
-  if (queueItem.path.match(/[a-zA-Z]+\?fref=hovercard/)) {
+  if (queueItem.path.match(/[a-zA-Z.0-9?=&]+fref=hovercard/)) {
     console.log("Fetched", queueItem.url);
   }
 });
 
-// only fetch friend hovercards and profiles (do not load more friends or posts)
+// only queue friend hovercards, profiles, friend lists
 crawler.addFetchCondition( (queueItem, referrerQueueItem, callback) => {
   hovercard = queueItem.uriPath === '/friends/hovercard/mbasic/'
-  profile = queueItem.path.match(/[a-zA-Z]+\?fref=hovercard/) !== null
-  callback(null, hovercard || profile);
+  profile = queueItem.path.match(/[a-zA-Z.0-9?=&]+fref=hovercard/) !== null
+  loadMoreFriends = (queueItem.uriPath === '/friends/center/friends/') && (!crawlTracker.atFriendsLoadedLimit())
+  // we also want to go to 'Show More' posts pages - if the crawler identifies such a link, which will only be if we need to go further back in time
+
+  callback(null, hovercard || profile || loadMoreFriends);
 });
+
 
 exports.index = async (req, res, next) => {
   request('https://mbasic.facebook.com/login.php', {
@@ -42,8 +76,6 @@ exports.index = async (req, res, next) => {
 };
 
 var login = (error, response, body) => {
-  console.log('login', error)
-
   var $ = cheerio.load(body)
   var formDefaults = {}
   var loginInputs = $("input")
