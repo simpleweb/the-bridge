@@ -1,7 +1,7 @@
 const friendsPerPage = 10;
 const numberOfFriendsToScrape = 30;
 
-const crawlTacker = class CrawlTacker {
+const crawlTracker = class CrawlTracker {
   constructor() {
     this._friendsLoaded = 0;
   }
@@ -23,4 +23,4 @@ const crawlTacker = class CrawlTacker {
   }
 };
 
-module.exports = crawlTacker;
+module.exports = crawlTracker;
