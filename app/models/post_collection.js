@@ -18,8 +18,6 @@ const postCollection = class PostCollection {
     articles.each(function(i, elem) {
       postStore.push(new Post(name, elem));
     });
-
-    //this.sort(this.store);
   }
 
   renderPosts() {    
