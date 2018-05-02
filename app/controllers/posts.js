@@ -53,13 +53,13 @@ crawler.on("fetchcomplete", (queueItem, responseBuffer, response) => {
   if (queueItem.path.match(/[a-zA-Z.0-9?=&]+fref=hovercard/)) {
     const $ = cheerio.load(responseBuffer.toString());
 
-    var articles = $('#recent');
-    var name = $('.bm').text();
+    let name = $('.bm').text();
     
-    // TODO: FInd more robust way of getting this.
-    while (articles.length !== 5) {
-      articles = articles.children();
-    }
+    let articles = $('span').filter(function()  {
+      return $(this).text().trim().match(/Like.+React/) !== null;
+    }).map(function() {
+      return $(this).parent().parent().parent();
+    });
 
     posts.addPosts(name, articles);
 
