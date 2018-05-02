@@ -2,11 +2,10 @@ const moment = require('moment');
 const chrono = require('chrono-node');
 
 exports.convertFacebookDate = (dateStr) => {
-  let isRelative = false;
-
-  if (dateStr.includes("ago") || dateStr.includes('Yesterday') || dateStr.includes('hrs') || dateStr.includes('mins')) {
-    isRelative = true;
-  }
+  let isRelative = dateStr.includes("ago") 
+    || dateStr.includes('Yesterday') 
+    || dateStr.includes('hrs') 
+    || dateStr.includes('mins');
 
   if (dateStr.includes('hrs')) {
     dateStr = dateStr.replace('hrs', 'hours ago');
