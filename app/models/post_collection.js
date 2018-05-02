@@ -5,7 +5,8 @@ const postCollection = class PostCollection {
     this.store = [];
   }
 
-  sort(array) {
+  sort() {
+    let array = this.store;
     return array.sort(function(a, b) {
       return new Date(b.timestamp) - new Date(a.timestamp);
     });
@@ -18,7 +19,7 @@ const postCollection = class PostCollection {
       postStore.push(new Post(name, elem));
     });
 
-    this.sort(this.store);
+    //this.sort(this.store);
   }
 
   renderPosts() {    

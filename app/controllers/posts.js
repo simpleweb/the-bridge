@@ -22,7 +22,7 @@ crawler.discoverResources = (buffer, queueItem) => {
 
   if (timestamps.length > 0) {
     // TO DO: ignore links if the final post on the page was sent earlier than the time from which we want to check more recent posts
-    console.log(dates.last().text())
+    console.log(timestamps.last().text())
   }
 
   return $("a[href]").map(function () {
@@ -36,6 +36,7 @@ crawler.on("crawlstart", () => {
 
 crawler.on("complete", () => {
   console.log("Complete");
+  posts.sort();
   posts.renderPosts();
 });
 
