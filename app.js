@@ -2,10 +2,14 @@ const express = require("express");
 const helmet = require("helmet");
 const path = require("path");
 const viewEngine = require("express-json-views");
+const cookieParser = require('cookie-parser');
 const routes = require("./config/routes");
 const errorHelpers = require("./app/helpers/errors");
 
 const app = express();
+
+// Add cookie parser middleware
+app.use(cookieParser());
 
 // adds sets of HTTP headers to add extra layers of security
 app.use(

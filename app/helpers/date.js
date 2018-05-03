@@ -17,7 +17,7 @@ exports.convertFacebookDate = (dateStr) => {
     dateStr = chrono.parseDate(dateStr);
   }
 
-  date = moment(dateStr, 'D MMMM at hh:mm');
+  date = moment(dateStr, ['D MMMM at hh:mm', 'D MMMM YYYY at hh:mm']);
 
   return date.valueOf();
 };
@@ -34,4 +34,8 @@ exports.prettyFormatRawDate = (date) => {
 
 exports.isBefore = (dateInQuestion, comparitorDate) => {
   return moment(dateInQuestion).isBefore(comparitorDate)
+}
+
+exports.isAfter = (dateInQuestion, comparitorDate) => {
+  return moment(dateInQuestion).isAfter(comparitorDate)
 }

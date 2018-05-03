@@ -11,10 +11,11 @@ const cheerio = require("cheerio")
 const crawlHelper= class CrawlHelper {
   constructor(options) {
     this._get_posts_since = dateHelper.convertStandardDate(options.get_posts_since)
+    this._get_posts_before = dateHelper.convertStandardDate(options.get_posts_before)
 
     this._crawler = new Crawler('https://mbasic.facebook.com/friends/center/friends/')
     this._crawlTracker = new CrawlTracker
-    this._posts = new PostCollection
+    this._posts = new PostCollection(this._get_posts_before, this._get_posts_since)
     this._crawlErrorHandler = new CrawlErrorHandler(this._crawler)
     this._jar = request.jar()
 
@@ -27,6 +28,10 @@ const crawlHelper= class CrawlHelper {
 
   get posts() {
     return this._posts;
+  }
+
+  setPostsBefore(dateVal) {
+    this._get_posts_before = new Date(dateVal);
   }
 
   setupCrawler() {
@@ -46,13 +51,16 @@ const crawlHelper= class CrawlHelper {
         var lastPostTimestamp = dateHelper.convertFacebookDate(
           likeAndReactSpans.last().parent().prev().find('abbr').text()
         )
-        console.log('last post timestamp', dateHelper.prettyFormatRawDate(lastPostTimestamp))
-        console.log('get_posts_since timestamp', dateHelper.prettyFormatRawDate(this._get_posts_since))
-        console.log('last post older than get_posts_since timestamp', dateHelper.isBefore(lastPostTimestamp, this._get_posts_since))
+        var firstPostTimestamp = dateHelper.convertFacebookDate(
+          likeAndReactSpans.first().parent().prev().find('abbr').text()
+        )
       }
 
       // ignore links on the page if the final post was sent earlier than the time from which we want to check more recent posts
-      if (likeAndReactSpans.length === 0 || !dateHelper.isBefore(lastPostTimestamp, this._get_posts_since)) {
+      let isTimeCorrect = dateHelper.isBefore(lastPostTimestamp, this._get_posts_since) 
+        && dateHelper.isAfter(firstPostTimestamp, this._get_posts_before);
+
+      if (likeAndReactSpans.length === 0 || !isTimeCorrect) {
         return $("a[href]").map(function () {
           return $(this).attr("href");
         }).get();
@@ -85,7 +93,9 @@ const crawlHelper= class CrawlHelper {
           return $(this).parent().parent().parent();
         });
 
-        var name = $('.bm').text();
+        var name = $('.bm')
+          .find('strong')
+          .text();
 
         this._posts.addPosts(name, articles);
 
@@ -96,6 +106,7 @@ const crawlHelper= class CrawlHelper {
 
   async login() {
     var loginScreen = await this.goToLoginScreen()
+
     var formDefaults = {}
     var loginInputs = loginScreen("input")
 
