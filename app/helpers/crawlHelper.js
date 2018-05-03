@@ -2,13 +2,16 @@ const Crawler = require("simplecrawler")
 const CrawlTracker = require("./crawlTracker")
 const PostCollection = require('../models/post_collection')
 const CrawlErrorHandler = require('./crawlErrorHandler')
+const dateHelper = require('./date')
 
 const request = require("request-promise-native")
 const url = require("url")
 const cheerio = require("cheerio")
 
 const crawlHelper= class CrawlHelper {
-  constructor() {
+  constructor(options) {
+    this._get_posts_since = dateHelper.convertStandardDate(options.get_posts_since)
+
     this._crawler = new Crawler('https://mbasic.facebook.com/friends/center/friends/')
     this._crawlTracker = new CrawlTracker
     this._posts = new PostCollection
@@ -37,18 +40,23 @@ const crawlHelper= class CrawlHelper {
     this._crawler.discoverResources = (buffer, queueItem) => {
       var $ = cheerio.load(buffer.toString("utf8"));
 
-      var timestamps = this.likeAndReactSpans($).map(function() {
-        return $(this).parent().prev().find('abbr');
-      })
+      var likeAndReactSpans = this.likeAndReactSpans($)
 
-      if (timestamps.length > 0) {
-        // TO DO: ignore links if the final post on the page was sent earlier than the time from which we want to check more recent posts
-        console.log(timestamps.last().text())
+      if (likeAndReactSpans.length > 0) {
+        var lastPostTimestamp = dateHelper.convertFacebookDate(
+          likeAndReactSpans.last().parent().prev().find('abbr').text()
+        )
+        console.log('last post timestamp', dateHelper.prettyFormatRawDate(lastPostTimestamp))
+        console.log('get_posts_since timestamp', dateHelper.prettyFormatRawDate(this._get_posts_since))
+        console.log('last post older than get_posts_since timestamp', dateHelper.isBefore(lastPostTimestamp, this._get_posts_since))
       }
 
-      return $("a[href]").map(function () {
-        return $(this).attr("href");
-      }).get();
+      // ignore links on the page if the final post was sent earlier than the time from which we want to check more recent posts
+      if (likeAndReactSpans.length === 0 || !dateHelper.isBefore(lastPostTimestamp, this._get_posts_since)) {
+        return $("a[href]").map(function () {
+          return $(this).attr("href");
+        }).get();
+      }
     };
 
     // only queue friend hovercards, profiles, friend lists
@@ -56,9 +64,9 @@ const crawlHelper= class CrawlHelper {
       var hovercard = queueItem.uriPath === '/friends/hovercard/mbasic/'
       var profile = this.isProfileLink(queueItem)
       var loadMoreFriends = (queueItem.uriPath === '/friends/center/friends/') && (!(this._crawlTracker.atFriendsLoadedLimit()))
-      // we also want to go to 'Show More' posts pages - if the crawler identifies such a link, which will only be if we need to go further back in time
+      var loadMorePosts = this.isMorePostsLoadedLink(queueItem)
 
-      callback(null, hovercard || profile || loadMoreFriends);
+      callback(null, hovercard || profile || loadMoreFriends || loadMorePosts);
     });
 
     // record that a new page of friends has been loaded
@@ -70,7 +78,7 @@ const crawlHelper= class CrawlHelper {
 
     // parse posts from a profile and add to posts store
     this._crawler.on("fetchcomplete", (queueItem, responseBuffer, response) => {
-      if (this.isProfileLink(queueItem)) {
+      if (this.isProfileLink(queueItem) || this.isMorePostsLoadedLink(queueItem)) {
         const $ = cheerio.load(responseBuffer.toString());
 
         var articles = this.likeAndReactSpans($).map(function() {
@@ -81,7 +89,7 @@ const crawlHelper= class CrawlHelper {
 
         this._posts.addPosts(name, articles);
 
-        console.log("Fetched a profile", queueItem.url);
+        console.log("Fetched a profile", queueItem.uriPath);
       }
     });
   }
@@ -153,6 +161,10 @@ const crawlHelper= class CrawlHelper {
 
   isProfileLink(queueItem){
     return queueItem.path.match(/[a-zA-Z.0-9?=&]+fref=hovercard/) !== null
+  }
+
+  isMorePostsLoadedLink(queueItem){
+    return queueItem.path.match(/[a-zA-Z.0-9]+\?sectionLoadingID=m_timeline_loading_div_/) !== null
   }
 };
 
