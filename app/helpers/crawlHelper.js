@@ -104,6 +104,31 @@ const crawlHelper= class CrawlHelper {
     });
   }
 
+  static buildOptions(query, cookies) {
+    var cookie = cookies.get_posts_since;
+    var before = null;
+    var since = null;
+
+    if (query.get_posts_before !== undefined) {
+      before = new Date(query.get_posts_before);
+    } else {
+      before = new Date();
+    }
+
+    if (query.get_posts_since !== undefined) {
+      since = new Date(query.get_posts_since);
+    } else if (cookie !== undefined) {
+      since = new Date(cookie);
+    } else {
+      since = new Date(new Date().getFullYear(), 0, 1)
+    }
+
+    return {
+      get_posts_since: since.toISOString(),
+      get_posts_before: before.toISOString()
+    };
+  }
+
   async login() {
     var loginScreen = await this.goToLoginScreen()
 
