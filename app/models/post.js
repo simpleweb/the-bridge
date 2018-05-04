@@ -25,7 +25,9 @@ const post = class Post {
       user = user + ' (w/ ' + name + ')';
     }
 
-    const content = $(article).find('p').text();
+    const content = $(article)
+      .find('p')
+      .text();
 
     return new Post(user, content, timestamp);
   }

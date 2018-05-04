@@ -3,6 +3,7 @@ const CrawlTracker = require("./crawlTracker")
 const PostCollection = require('../models/post_collection')
 const CrawlErrorHandler = require('./crawlErrorHandler')
 const dateHelper = require('./date')
+const HashHelper = require('./hashHelper')
 
 const request = require("request-promise-native")
 const url = require("url")
@@ -93,9 +94,7 @@ const crawlHelper= class CrawlHelper {
           return $(this).parent().parent().parent();
         });
 
-        var name = $('.bm')
-          .find('strong')
-          .text();
+        var name = $('.bm').text();
 
         this._posts.addPosts(name, articles);
 
@@ -105,7 +104,6 @@ const crawlHelper= class CrawlHelper {
   }
 
   static buildOptions(query, cookies) {
-    var cookie = cookies.get_posts_since;
     var before = null;
     var since = null;
 
@@ -113,17 +111,25 @@ const crawlHelper= class CrawlHelper {
       before = new Date(query.get_posts_before);
     } else {
       before = new Date();
-    }
+    } 
 
     if (query.get_posts_since !== undefined) {
       since = new Date(query.get_posts_since);
-    } else if (cookie !== undefined) {
-      since = new Date(cookie);
+    } else if (cookies.get_posts_since !== undefined) {
+      // Check it's your cookie first
+      if (HashHelper.Compare(cookies.user, process.env.EMAIL)) {
+        since = new Date(cookies.get_posts_since);
+      } else {
+        since = new Date(new Date().getFullYear(), 0, 1)
+      }
     } else {
       since = new Date(new Date().getFullYear(), 0, 1)
     }
 
+    const user = HashHelper.GenerateHash(process.env.EMAIL);
+
     return {
+      user: user,
       get_posts_since: since.toISOString(),
       get_posts_before: before.toISOString()
     };
