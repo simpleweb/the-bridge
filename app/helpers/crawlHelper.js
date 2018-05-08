@@ -105,15 +105,15 @@ const crawlHelper= class CrawlHelper {
     var user = HashHelper.GenerateHash(process.env.EMAIL);
     var get_posts_since_cookie_key = `get_posts_since_for_${user}`;
 
-    if (query.get_posts_before !== undefined) {
+    if (query && query.get_posts_before !== undefined) {
       before = query.get_posts_before;
     } else {
       before = dateHelper.isoNow();
     }
 
-    if (query.get_posts_since !== undefined) {
+    if (query && query.get_posts_since !== undefined) {
       since = query.get_posts_since;
-    } else if (cookies[get_posts_since_cookie_key] !== undefined) {
+    } else if (cookies && cookies[get_posts_since_cookie_key] !== undefined) {
       since = cookies[get_posts_since_cookie_key];
     } else {
       since = dateHelper.isoTwoHoursAgo()
