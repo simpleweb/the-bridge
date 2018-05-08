@@ -52,16 +52,12 @@ const crawlHelper= class CrawlHelper {
         var lastPostTimestamp = dateHelper.convertFacebookDate(
           likeAndReactSpans.last().parent().prev().find('abbr').text()
         )
-        var firstPostTimestamp = dateHelper.convertFacebookDate(
-          likeAndReactSpans.first().parent().prev().find('abbr').text()
-        )
       }
 
       // ignore links on the page if the final post was sent earlier than the time from which we want to check more recent posts
-      let isTimeCorrect = dateHelper.isBefore(lastPostTimestamp, this._get_posts_since) 
-        && dateHelper.isAfter(firstPostTimestamp, this._get_posts_before);
+      let isAtOldEnoughPosts = dateHelper.isBefore(lastPostTimestamp, this._get_posts_since)
 
-      if (likeAndReactSpans.length === 0 || !isTimeCorrect) {
+      if (likeAndReactSpans.length === 0 || !isAtOldEnoughPosts) {
         return $("a[href]").map(function () {
           return $(this).attr("href");
         }).get();
@@ -108,30 +104,30 @@ const crawlHelper= class CrawlHelper {
     var since = null;
 
     if (query.get_posts_before !== undefined) {
-      before = new Date(query.get_posts_before);
+      before = query.get_posts_before;
     } else {
-      before = new Date();
-    } 
+      before = new Date().toISOString();
+    }
 
     if (query.get_posts_since !== undefined) {
-      since = new Date(query.get_posts_since);
+      since = query.get_posts_since;
     } else if (cookies.get_posts_since !== undefined) {
       // Check it's your cookie first
       if (HashHelper.Compare(cookies.user, process.env.EMAIL)) {
-        since = new Date(cookies.get_posts_since);
+        since = cookies.get_posts_since;
       } else {
-        since = new Date(new Date().getFullYear(), 0, 1)
+        since = dateHelper.twoHoursAgo()
       }
     } else {
-      since = new Date(new Date().getFullYear(), 0, 1)
+      since = dateHelper.twoHoursAgo()
     }
 
     const user = HashHelper.GenerateHash(process.env.EMAIL);
 
     return {
       user: user,
-      get_posts_since: since.toISOString(),
-      get_posts_before: before.toISOString()
+      get_posts_since: since,
+      get_posts_before: before
     };
   }
 

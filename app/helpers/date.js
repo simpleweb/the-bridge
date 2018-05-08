@@ -39,3 +39,7 @@ exports.isBefore = (dateInQuestion, comparitorDate) => {
 exports.isAfter = (dateInQuestion, comparitorDate) => {
   return moment(dateInQuestion).isAfter(comparitorDate)
 }
+
+exports.twoHoursAgo = () => {
+  return moment().subtract(2, 'hours')
+}
