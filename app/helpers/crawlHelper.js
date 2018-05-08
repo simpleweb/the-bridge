@@ -106,7 +106,7 @@ const crawlHelper= class CrawlHelper {
     if (query.get_posts_before !== undefined) {
       before = query.get_posts_before;
     } else {
-      before = new Date().toISOString();
+      before = dateHelper.isoNow();
     }
 
     if (query.get_posts_since !== undefined) {
@@ -116,10 +116,10 @@ const crawlHelper= class CrawlHelper {
       if (HashHelper.Compare(cookies.user, process.env.EMAIL)) {
         since = cookies.get_posts_since;
       } else {
-        since = dateHelper.twoHoursAgo()
+        since = dateHelper.isoTwoHoursAgo()
       }
     } else {
-      since = dateHelper.twoHoursAgo()
+      since = dateHelper.isoTwoHoursAgo()
     }
 
     const user = HashHelper.GenerateHash(process.env.EMAIL);

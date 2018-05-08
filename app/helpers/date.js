@@ -32,6 +32,16 @@ exports.prettyFormatRawDate = (date) => {
   return moment(date).format('MMMM Do YYYY, h:mm:ss a')
 }
 
+exports.isoTwoHoursAgo = () => {
+  // returns ISO string for two hours ago
+  return moment().subtract(2, 'hours').format()
+}
+
+exports.isoNow = () => {
+  // returns ISO string for current time
+  return moment().format()
+}
+
 exports.isBefore = (dateInQuestion, comparitorDate) => {
   return moment(dateInQuestion).isBefore(comparitorDate)
 }
@@ -40,6 +50,3 @@ exports.isAfter = (dateInQuestion, comparitorDate) => {
   return moment(dateInQuestion).isAfter(comparitorDate)
 }
 
-exports.twoHoursAgo = () => {
-  return moment().subtract(2, 'hours')
-}
