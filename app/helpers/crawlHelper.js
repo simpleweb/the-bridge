@@ -90,7 +90,7 @@ const crawlHelper= class CrawlHelper {
           return $(this).parent().parent().parent();
         });
 
-        var name = $('#root strong').first().text();
+        var name = $('#m-timeline-cover-section strong').text();
 
         this._posts.addPosts(name, articles);
 
