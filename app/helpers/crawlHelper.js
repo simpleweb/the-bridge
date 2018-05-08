@@ -94,7 +94,7 @@ const crawlHelper= class CrawlHelper {
           return $(this).parent().parent().parent();
         });
 
-        var name = $('.bm').text();
+        var name = $('#root strong').first().text();
 
         this._posts.addPosts(name, articles);
 
