@@ -3,10 +3,8 @@ _crawlHelper = require('../helpers/crawlHelper')
 exports.index = async (req, res, next) => {
   try {
     const options = _crawlHelper.buildOptions(req.query, req.cookies);
-
     // Create cookie with start date
-    res.cookie('user', options.user);
-    res.cookie('get_posts_since', options.get_posts_before);
+    res.cookie(`get_posts_since_for_${options.user}`, options.get_posts_before)
 
     var crawlHelper = new _crawlHelper(options);
 

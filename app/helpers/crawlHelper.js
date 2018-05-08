@@ -102,6 +102,8 @@ const crawlHelper= class CrawlHelper {
   static buildOptions(query, cookies) {
     var before = null;
     var since = null;
+    var user = HashHelper.GenerateHash(process.env.EMAIL);
+    var get_posts_since_cookie_key = `get_posts_since_for_${user}`;
 
     if (query.get_posts_before !== undefined) {
       before = query.get_posts_before;
@@ -111,18 +113,11 @@ const crawlHelper= class CrawlHelper {
 
     if (query.get_posts_since !== undefined) {
       since = query.get_posts_since;
-    } else if (cookies.get_posts_since !== undefined) {
-      // Check it's your cookie first
-      if (HashHelper.Compare(cookies.user, process.env.EMAIL)) {
-        since = cookies.get_posts_since;
-      } else {
-        since = dateHelper.isoTwoHoursAgo()
-      }
+    } else if (cookies[get_posts_since_cookie_key] !== undefined) {
+      since = cookies[get_posts_since_cookie_key];
     } else {
       since = dateHelper.isoTwoHoursAgo()
     }
-
-    const user = HashHelper.GenerateHash(process.env.EMAIL);
 
     return {
       user: user,
