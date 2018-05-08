@@ -4,6 +4,7 @@ const PostCollection = require('../models/post_collection')
 const CrawlErrorHandler = require('./crawlErrorHandler')
 const dateHelper = require('./date')
 const HashHelper = require('./hashHelper')
+const FetchQueue = require('simplecrawler/lib/queue')
 
 const request = require("request-promise-native")
 const url = require("url")
@@ -11,9 +12,7 @@ const cheerio = require("cheerio")
 
 const crawlHelper= class CrawlHelper {
   constructor(options) {
-    this._get_posts_since = dateHelper.convertStandardDate(options.get_posts_since)
-    this._get_posts_before = dateHelper.convertStandardDate(options.get_posts_before)
-
+    this.setTimestampts(options)
     this._crawler = new Crawler('https://mbasic.facebook.com/friends/center/friends/')
     this._crawlTracker = new CrawlTracker
     this._posts = new PostCollection(this._get_posts_before, this._get_posts_since)
@@ -23,16 +22,31 @@ const crawlHelper= class CrawlHelper {
     this.setupCrawler()
   }
 
+  reset(options) {
+    this.setTimestampts(options)
+    this._crawlTracker.reset()
+    this._crawler.queue = new FetchQueue()
+  }
+
+  setTimestampts(options) {
+    this._get_posts_since = dateHelper.convertStandardDate(options.get_posts_since)
+    this._get_posts_before = dateHelper.convertStandardDate(options.get_posts_before)
+  }
+
+  get get_posts_since() {
+    return dateHelper.isoDate(this._get_posts_since)
+  }
+
+  get get_posts_before() {
+    return dateHelper.isoDate(this._get_posts_before)
+  }
+
   get crawler() {
     return this._crawler;
   }
 
   get posts() {
     return this._posts;
-  }
-
-  setPostsBefore(dateVal) {
-    this._get_posts_before = new Date(dateVal);
   }
 
   setupCrawler() {
@@ -56,6 +70,8 @@ const crawlHelper= class CrawlHelper {
 
       // ignore links on the page if the final post was sent earlier than the time from which we want to check more recent posts
       let isAtOldEnoughPosts = dateHelper.isBefore(lastPostTimestamp, this._get_posts_since)
+
+      console.log('isAtOldEnoughPosts', isAtOldEnoughPosts, 'get posts since', dateHelper.prettyFormatRawDate(this._get_posts_since))
 
       if (likeAndReactSpans.length === 0 || !isAtOldEnoughPosts) {
         return $("a[href]").map(function () {

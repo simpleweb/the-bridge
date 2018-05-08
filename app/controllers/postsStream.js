@@ -7,26 +7,23 @@ exports.index = async (ws, request) => {
   console.log('web socket connection established')
 
   const options = _crawlHelper.buildOptions(url.parse(request.url).query, null);
-
-  triggerCrawl(options, ws)
-};
-
-triggerCrawl = async (options, ws) => {
   crawlHelper = new _crawlHelper(options)
-
-  await crawlHelper.login()
 
   crawlHelper.crawler.on("complete", () => {
     console.log('lookup complete')
 
     ws.send(JSON.stringify({
       posts: crawlHelper.posts.sort(),
-      got_posts_since: options.get_posts_since,
-      got_posts_before: options.get_posts_before
+      got_posts_since: crawlHelper.get_posts_since,
+      got_posts_before: crawlHelper.get_posts_before
     }))
 
-    triggerCrawl({get_posts_before: dateHelper.isoNow(), get_posts_since: options.get_posts_before}, ws)
+    setTimeout(() => {
+      crawlHelper.reset({get_posts_before: dateHelper.isoNow(), get_posts_since: crawlHelper.get_posts_before})
+      crawlHelper.crawler.start();
+    }, 5000)
   });
 
-  crawlHelper.crawler.start();
-}
+  await crawlHelper.login()
+  crawlHelper.crawler.start()
+};

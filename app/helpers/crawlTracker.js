@@ -10,6 +10,10 @@ const crawlTracker = class CrawlTracker {
     this._friendsLoaded += friendsPerPage;
   }
 
+  reset() {
+    this._friendsLoaded = 0;
+  }
+
   get friendsLoaded() {
     return this._friendsLoaded;
   }

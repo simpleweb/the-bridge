@@ -32,6 +32,11 @@ exports.prettyFormatRawDate = (date) => {
   return moment(date).format('MMMM Do YYYY, h:mm:ss a')
 }
 
+exports.isoDate = (date) => {
+  // takes date object and converts into ISO string
+  return moment(date).format()
+}
+
 exports.isoTwoHoursAgo = () => {
   // returns ISO string for two hours ago
   return moment().subtract(2, 'hours').format()
