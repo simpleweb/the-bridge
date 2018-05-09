@@ -1,6 +1,7 @@
 const _crawlHelper = require('../helpers/crawlHelper')
 const dateHelper = require('../helpers/date')
 const url = require('url')
+var payload
 var crawlHelper
 
 exports.index = async (ws, request) => {
@@ -12,18 +13,26 @@ exports.index = async (ws, request) => {
   crawlHelper.crawler.on("complete", () => {
     console.log('lookup complete')
 
-    ws.send(JSON.stringify({
+    payload = JSON.stringify({
       posts: crawlHelper.posts.sort(),
       got_posts_since: crawlHelper.get_posts_since,
       got_posts_before: crawlHelper.get_posts_before
-    }))
+    })
 
-    setTimeout(() => {
-      crawlHelper.reset({get_posts_before: dateHelper.isoNow(), get_posts_since: crawlHelper.get_posts_before})
-      crawlHelper.crawler.start();
-    }, 5000)
+    ws.send(payload, sendUpdateCallback)
   });
 
   await crawlHelper.login()
   crawlHelper.crawler.start()
 };
+
+sendUpdateCallback = (error) => {
+  if (error) {
+    console.log('connection lost')
+  } else {
+    setTimeout(() => {
+      crawlHelper.reset({get_posts_before: dateHelper.isoNow(), get_posts_since: crawlHelper.get_posts_before})
+      crawlHelper.crawler.start();
+    }, 5000)
+  }
+}
