@@ -38,3 +38,6 @@ sendUpdateCallback = (error) => {
     }, environment_config.intervalBetweenLookups)
   }
 }
+
+// TO DO: should not be able to open a new connection while a crawl is being carried out for the same user
+// This could just mean only allowing one client to connect
