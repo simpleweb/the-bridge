@@ -1,6 +1,6 @@
 const _crawlHelper = require('../helpers/crawlHelper')
 const dateHelper = require('../helpers/date')
-const url = require('url')
+const urlHelper = require('../helpers/url')
 const environment_config = require("../../config/environments/config")
 
 var payload
@@ -9,7 +9,7 @@ var crawlHelper
 exports.index = async (ws, request) => {
   console.log('web socket connection established')
 
-  const options = _crawlHelper.buildOptions(url.parse(request.url).query, null);
+  const options = _crawlHelper.buildOptions(urlHelper.extractTimestampParams(request.url), null);
   crawlHelper = new _crawlHelper(options)
 
   crawlHelper.crawler.on("complete", () => {

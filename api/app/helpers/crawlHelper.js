@@ -30,6 +30,7 @@ const crawlHelper= class CrawlHelper {
   }
 
   setTimestampts(options) {
+    console.log('timestamp options', options)
     this._get_posts_since = dateHelper.convertStandardDate(options.get_posts_since)
     this._get_posts_before = dateHelper.convertStandardDate(options.get_posts_before)
   }
@@ -120,13 +121,13 @@ const crawlHelper= class CrawlHelper {
     var user = HashHelper.GenerateHash(process.env.EMAIL);
     var get_posts_since_cookie_key = `get_posts_since_for_${user}`;
 
-    if (query && query.get_posts_before !== undefined) {
+    if (query && query.get_posts_before) {
       before = query.get_posts_before;
     } else {
       before = dateHelper.isoNow();
     }
 
-    if (query && query.get_posts_since !== undefined) {
+    if (query && query.get_posts_since) {
       since = query.get_posts_since;
     } else if (cookies && cookies[get_posts_since_cookie_key] !== undefined) {
       since = cookies[get_posts_since_cookie_key];
