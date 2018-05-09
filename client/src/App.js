@@ -3,7 +3,6 @@ import Posts from "./components/Posts"
 import "./App.css"
 
 import Sockette from "sockette"
-var ws;
 
 class App extends Component{
   constructor(props) {
@@ -68,11 +67,11 @@ class App extends Component{
   }
 
   openConnection(event){
-    ws = new Sockette(this.socketteUrl(), this.socketteOptions)
+    this.ws = new Sockette(this.socketteUrl(), this.socketteOptions)
   }
 
   stopConnection(event){
-    ws.close()
+    this.ws.close()
   }
 
   openOrClose(){
