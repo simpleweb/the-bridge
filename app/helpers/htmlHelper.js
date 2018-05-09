@@ -30,6 +30,7 @@ const htmlHelper = class HtmlHelper {
   }
 
   getUserFromArticle() {
+    let $ = this.$;
     return this
       .$('h3 a')
       .first();

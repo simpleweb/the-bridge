@@ -30,7 +30,7 @@ const post = class Post {
       .getContentFromArticle()
       .text();
 
-    if (content === null) {
+    if (content === null || !content) {
       return null;
     }
 
