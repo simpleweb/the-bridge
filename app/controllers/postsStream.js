@@ -1,6 +1,8 @@
 const _crawlHelper = require('../helpers/crawlHelper')
 const dateHelper = require('../helpers/date')
 const url = require('url')
+const environment_config = require("../../config/environments/config")
+
 var payload
 var crawlHelper
 
@@ -33,6 +35,6 @@ sendUpdateCallback = (error) => {
     setTimeout(() => {
       crawlHelper.reset({get_posts_before: dateHelper.isoNow(), get_posts_since: crawlHelper.get_posts_before})
       crawlHelper.crawler.start();
-    }, 5000)
+    }, environment_config.intervalBetweenLookups)
   }
 }

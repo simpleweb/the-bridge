@@ -71,8 +71,6 @@ const crawlHelper= class CrawlHelper {
       // ignore links on the page if the final post was sent earlier than the time from which we want to check more recent posts
       let isAtOldEnoughPosts = dateHelper.isBefore(lastPostTimestamp, this._get_posts_since)
 
-      console.log('isAtOldEnoughPosts', isAtOldEnoughPosts, 'get posts since', dateHelper.prettyFormatRawDate(this._get_posts_since))
-
       if (likeAndReactSpans.length === 0 || !isAtOldEnoughPosts) {
         return $("a[href]").map(function () {
           return $(this).attr("href");

@@ -9,9 +9,6 @@ const crawlErrorHandler = class CrawlErrorHandler {
       console.log("queue error", error)
       throw error
     })
-    this._crawler.on("queueduplicate", (URLData) => {
-      console.log("queue duplicate error", URLData)
-    })
     this._crawler.on("robotstxterror", (error) => {
       console.log("robots txt error", error)
       throw error
