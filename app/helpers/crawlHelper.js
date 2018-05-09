@@ -24,6 +24,7 @@ const crawlHelper= class CrawlHelper {
 
   reset(options) {
     this.setTimestampts(options)
+    this._posts = new PostCollection(this._get_posts_before, this._get_posts_since)
     this._crawlTracker.reset()
     this._crawler.queue = new FetchQueue()
   }
