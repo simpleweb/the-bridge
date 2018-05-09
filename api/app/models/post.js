@@ -1,5 +1,5 @@
 const dateHelper = require('../helpers/date');
-const $ = require("cheerio");
+const HtmlHelper = require('../helpers/htmlHelper');
 
 const post = class Post {
   constructor(user, content, timestamp) {
@@ -10,24 +10,29 @@ const post = class Post {
   }
 
   static CreatePost(name, article, before, since) {
-    const timestamp = dateHelper.convertFacebookDate($(article).find('abbr').text());
+    const htmlHelper = new HtmlHelper(article);
+
+    const timestamp = dateHelper.convertFacebookDate(htmlHelper.getDateFromArticle().text());
 
     if (!dateHelper.isBefore(timestamp, before) || !dateHelper.isAfter(timestamp, since)) {
       return null;
     }
 
-    let user = $(article)
-      .find('h3 a')
-      .first()
+    let user = htmlHelper
+      .getUserFromArticle()
       .text();
 
     if (name !== user) {
       user = user + ' (w/ ' + name + ')';
     }
 
-    const content = $(article)
-      .find('p')
+    const content = htmlHelper
+      .getContentFromArticle()
       .text();
+
+    if (content === null) {
+      return null;
+    }
 
     return new Post(user, content, timestamp);
   }

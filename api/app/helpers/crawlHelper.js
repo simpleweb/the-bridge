@@ -2,15 +2,14 @@ const Crawler = require("simplecrawler")
 const CrawlTracker = require("./crawlTracker")
 const PostCollection = require('../models/post_collection')
 const CrawlErrorHandler = require('./crawlErrorHandler')
+const HtmlHelper = require('./htmlHelper');
 const dateHelper = require('./date')
 const HashHelper = require('./hashHelper')
 const FetchQueue = require('simplecrawler/lib/queue')
 
 const request = require("request-promise-native")
 const url = require("url")
-const cheerio = require("cheerio")
-
-const HtmlHelper = require('./htmlHelper');
+const cheerio = require('cheerio')
 
 const crawlHelper= class CrawlHelper {
   constructor(options) {
@@ -64,7 +63,7 @@ const crawlHelper= class CrawlHelper {
     this._crawler.discoverResources = (buffer, queueItem) => {
       const htmlHelper = new HtmlHelper(buffer);
 
-      var likeAndReactSpans = htmlHelper.likeAndReactSpans($)
+      var likeAndReactSpans = htmlHelper.likeAndReactSpans()
 
       if (likeAndReactSpans.length > 0) {
         var lastPostTimestamp = dateHelper.convertFacebookDate(
@@ -76,9 +75,7 @@ const crawlHelper= class CrawlHelper {
       let isAtOldEnoughPosts = dateHelper.isBefore(lastPostTimestamp, this._get_posts_since)
 
       if (likeAndReactSpans.length === 0 || !isAtOldEnoughPosts) {
-        return $("a[href]").map(function () {
-          return $(this).attr("href");
-        }).get();
+        return htmlHelper.getUrlsFromLinks().get();
       }
     };
 

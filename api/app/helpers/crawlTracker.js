@@ -1,5 +1,5 @@
 const friendsPerPage = 10;
-const numberOfFriendsToScrape = 30;
+const numberOfFriendsToScrape = 100;
 
 const crawlTracker = class CrawlTracker {
   constructor() {
@@ -19,7 +19,7 @@ const crawlTracker = class CrawlTracker {
   }
 
   get numberOfFriendsToScrape() {
-    return  numberOfFriendsToScrape;
+    return numberOfFriendsToScrape;
   }
 
   atFriendsLoadedLimit(){
