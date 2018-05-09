@@ -10,6 +10,8 @@ const request = require("request-promise-native")
 const url = require("url")
 const cheerio = require("cheerio")
 
+const HtmlHelper = require('./htmlHelper');
+
 const crawlHelper= class CrawlHelper {
   constructor(options) {
     this.setTimestampts(options)
@@ -60,9 +62,9 @@ const crawlHelper= class CrawlHelper {
     })
 
     this._crawler.discoverResources = (buffer, queueItem) => {
-      var $ = cheerio.load(buffer.toString("utf8"));
+      const htmlHelper = new HtmlHelper(buffer);
 
-      var likeAndReactSpans = this.likeAndReactSpans($)
+      var likeAndReactSpans = htmlHelper.likeAndReactSpans($)
 
       if (likeAndReactSpans.length > 0) {
         var lastPostTimestamp = dateHelper.convertFacebookDate(
@@ -100,13 +102,13 @@ const crawlHelper= class CrawlHelper {
     // parse posts from a profile and add to posts store
     this._crawler.on("fetchcomplete", (queueItem, responseBuffer, response) => {
       if (this.isProfileLink(queueItem) || this.isMorePostsLoadedLink(queueItem)) {
-        const $ = cheerio.load(responseBuffer.toString());
+        const htmlHelper = new HtmlHelper(responseBuffer);
 
-        var articles = this.likeAndReactSpans($).map(function() {
-          return $(this).parent().parent().parent();
-        });
-
-        var name = $('#m-timeline-cover-section strong').text();
+        var articles = htmlHelper.getArticles();
+        
+        var name = htmlHelper
+          .getProfileName()
+          .text();
 
         this._posts.addPosts(name, articles);
 
@@ -200,12 +202,6 @@ const crawlHelper= class CrawlHelper {
       return i.replace('.facebook.com', 'mbasic.facebook.com')
     })
     this._crawler.cookies.addFromHeaders(parsedCookieHeaders);
-  }
-
-  likeAndReactSpans($){
-    return $('span').filter(function()  {
-      return $(this).text().trim().match(/Like.+React/) !== null;
-    })
   }
 
   isProfileLink(queueItem){
