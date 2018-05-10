@@ -2,7 +2,7 @@ const Crawler = require("simplecrawler")
 const CrawlTracker = require("./crawlTracker")
 const PostCollection = require('../models/post_collection')
 const CrawlErrorHandler = require('./crawlErrorHandler')
-const HtmlHelper = require('./htmlHelper');
+const HtmlHelper = require('./htmlHelper')
 const dateHelper = require('./date')
 const HashHelper = require('./hashHelper')
 const FetchQueue = require('simplecrawler/lib/queue')
@@ -101,8 +101,8 @@ const crawlHelper= class CrawlHelper {
       if (this.isProfileLink(queueItem) || this.isMorePostsLoadedLink(queueItem)) {
         const htmlHelper = new HtmlHelper(responseBuffer);
 
-        var articles = htmlHelper.getArticles();
-        
+        let articles = htmlHelper.getArticles();
+
         var name = htmlHelper
           .getProfileName()
           .text();
@@ -199,6 +199,12 @@ const crawlHelper= class CrawlHelper {
       return i.replace('.facebook.com', 'mbasic.facebook.com')
     })
     this._crawler.cookies.addFromHeaders(parsedCookieHeaders);
+  }
+
+  likeAndReactSpans($){
+    return $('span').filter(function()  {
+      return $(this).text().trim().match(/Like.+React/) !== null;
+    })
   }
 
   isProfileLink(queueItem){
