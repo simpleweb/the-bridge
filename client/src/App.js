@@ -23,8 +23,7 @@ class App extends Component{
 
   socketteUrl(){
     if (this.state.got_posts_before) {
-      console.log(`ws://localhost:8080/postsstream?get_posts_since=${this.state.got_posts_before}`)
-      return `ws://localhost:8080/postsstream?get_posts_since=${this.state.got_posts_before}`
+      return `ws://localhost:8080/postsstream?get_posts_since=${encodeURIComponent(this.state.got_posts_before)}`
     } else {
       return 'ws://localhost:8080/postsstream'
     }
