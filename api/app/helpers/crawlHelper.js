@@ -83,7 +83,7 @@ const crawlHelper= class CrawlHelper {
     this._crawler.addFetchCondition( (queueItem, referrerQueueItem, callback) => {
       var hovercard = queueItem.uriPath === '/friends/hovercard/mbasic/'
       var profile = this.isProfileLink(queueItem)
-      var loadMoreFriends = (queueItem.uriPath === '/friends/center/friends/') && (!(this._crawlTracker.atFriendsLoadedLimit()))
+      var loadMoreFriends = this.isMoreFriendsLink(queueItem) && (!(this._crawlTracker.atFriendsLoadedLimit()))
       var loadMorePosts = this.isMorePostsLoadedLink(queueItem)
 
       callback(null, hovercard || profile || loadMoreFriends || loadMorePosts);
@@ -91,7 +91,7 @@ const crawlHelper= class CrawlHelper {
 
     // record that a new page of friends has been loaded
     this._crawler.on("queueadd", (queueItem, referrerQueueItem) => {
-      if (queueItem.uriPath === '/friends/center/friends/') {
+      if (this.isMoreFriendsLink(queueItem)) {
         this._crawlTracker.loadedMoreFriends()
       }
     })
@@ -213,6 +213,10 @@ const crawlHelper= class CrawlHelper {
 
   isMorePostsLoadedLink(queueItem){
     return queueItem.path.match(/[a-zA-Z.0-9]+\?sectionLoadingID=m_timeline_loading_div_/) !== null
+  }
+
+  isMoreFriendsLink(queueItem){
+    return (queueItem.path.match(/\/friends\/center\/friends/) !== null) && (queueItem.path.match(/mfl_act=/) === null)
   }
 };
 

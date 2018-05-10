@@ -3,7 +3,7 @@ const numberOfFriendsToScrape = 30;
 
 const crawlTracker = class CrawlTracker {
   constructor() {
-    this._friendsLoaded = 0;
+    this._friendsLoaded = 10;
   }
 
   loadedMoreFriends() {
@@ -11,7 +11,7 @@ const crawlTracker = class CrawlTracker {
   }
 
   reset() {
-    this._friendsLoaded = 0;
+    this._friendsLoaded = 10;
   }
 
   get friendsLoaded() {

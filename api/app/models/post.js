@@ -31,6 +31,7 @@ const post = class Post {
       .text();
 
     if (content === null || !content) {
+      console.log('no content', name)
       return null;
     }
 
