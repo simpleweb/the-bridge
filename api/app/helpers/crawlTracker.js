@@ -19,7 +19,7 @@ const crawlTracker = class CrawlTracker {
   }
 
   get numberOfFriendsToScrape() {
-    return  numberOfFriendsToScrape;
+    return numberOfFriendsToScrape;
   }
 
   atFriendsLoadedLimit(){
