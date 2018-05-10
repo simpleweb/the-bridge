@@ -41,5 +41,3 @@ exports.index = async (ws, request) => {
   await crawlHelper.login()
   crawlHelper.crawler.start()
 };
-
-// TO DO: stop crawler from starting if the connection goes during the interval between crawls
