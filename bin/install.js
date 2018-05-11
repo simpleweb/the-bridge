@@ -1,7 +1,7 @@
 const async = require('async');
 const envfile = require('envfile');
 const execa = require('execa');
-const fs = require('fs')
+const fs = require('fs');
 const path = require('path');
 
 const credentials = require('./credentials');
