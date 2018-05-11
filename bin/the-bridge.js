@@ -3,8 +3,8 @@
 const figlet = require('figlet');
 const meow = require('meow');
 
-const install = require('./install');
-const start = require('./start');
+const install = require('./lib/install');
+const start = require('./lib/start');
 
 console.log(figlet.textSync('The Bridge', { 
   horizontalLayout: 'full' }));
