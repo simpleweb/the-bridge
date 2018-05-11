@@ -1,10 +1,7 @@
 const inquirer = require('inquirer');
 
 module.exports = {
-  // TODO: Refactor how questions are asked
-  getFacebookCredentials: (test) => {
-    console.log('This is a: ' + test);
-
+  getFacebookCredentials: () => {
     const questions = [
       {
         name: 'email',
