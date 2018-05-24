@@ -10,7 +10,7 @@ These lofty ambitions were tamed into a manageable goal: build a tool that pulls
 
 ## So what is it?  
 
-This project includes a completely self-contained (express.js) API for pulling in your Facebook friends' posts, and a (react.js) client you can use to consume it. Running both together on your machine, you can get a (not very pretty) live feed of what your friends are posting, without filtering our posts like the Facebook newsfeed does.  
+This project includes a completely self-contained (express.js) API for pulling in your Facebook friends' posts, and a (react.js) client you can use to consume it. Running both together on your machine, you can get a (not very pretty) live feed of what your friends are posting, without filtering your posts like the Facebook newsfeed does.  
 
 ## How do I use it?
 
