@@ -37,7 +37,11 @@ const htmlHelper = class HtmlHelper {
   }
 
   getContentFromArticle() {
-    return this.$('p');
+    if (this.$('p').text()) {
+      return this.$('p')
+    } else {
+      return this.$('p').first().next()
+    }
   }
 
   getProfileName() {
