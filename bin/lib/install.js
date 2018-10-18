@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const credentials = require('./credentials');
+const dotenvPath = path.join('../api', '.env');
 
 const installPackages = async () => {
   async.parallel([
@@ -25,8 +26,8 @@ const installPackages = async () => {
 };
 
 const answersToFile = async (answers) => {
-  fs.writeFile(dotenvPath, 
-    'EMAIL='+ answers.email + 
+  fs.writeFile(dotenvPath,
+    'EMAIL='+ answers.email +
     '\nPASS=' + answers.password);
 };
 
@@ -47,12 +48,11 @@ const setupUser = async () => {
 };
 
 exports.installServices = () => {
-  const dotenvPath = path.join('../api', '.env');
   const dotenvExists = fs.existsSync(dotenvPath);
 
   if (dotenvExists) {
     console.log('A dotenv file already exists.');
-    
+
     shouldOverwrite().then(answer => {
       answer.overwrite ? setupUser() : installPackages();
     });
