@@ -10,7 +10,7 @@ class Posts extends Component{
     return(
       <div className="Posts">
         { this.props.posts.map((post) => {
-            return <Post post={post} key={`${post.timestamp}-${post.user}`}/>
+            return <Post post={post} key={`${post.timestamp}-${post.user}-${post.content.substring(0,3)}`}/>
           })
         }
       </div>
