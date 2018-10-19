@@ -1,18 +1,29 @@
 const moment = require('moment');
 const chrono = require('chrono-node');
 
-exports.convertFacebookDate = (dateStr) => {
+exports.convertFacebookDate = (dateStr, currentCrawlBegan) => {
+  if (dateStr === 'Just now') {
+    console.log('Post posted just now')
+    // using the current time eliminates the post from the current crawl (which only includes posts from before the crawl began)
+    // and the post may not be picked up in the next crawl because it WAS sent before the last crawl, when it should have been picked up
+    // so here we assume it was sent just before the crawl began,
+    // though it may be picked up again in the next crawl
+    return moment(currentCrawlBegan - 1).valueOf();
+  }
+
   let isRelative = dateStr.includes("ago")
     || dateStr.includes('Yesterday')
     || dateStr.includes('hr')
-    || dateStr.includes('mins');
+    || dateStr.includes('min')
 
   if (dateStr.includes('hrs')) {
     dateStr = dateStr.replace('hrs', 'hours ago');
   } else if (dateStr.includes('mins')) {
     dateStr = dateStr.replace('mins', 'mins ago');
+  } else if (dateStr.includes('min')) {
+    dateStr = dateStr.replace('min', 'min ago');
   } else if (dateStr.includes('hr')) {
-    dateStr = dateStr.replace('hr', 'hour ago')
+    dateStr = dateStr.replace('hr', 'hour ago');
   }
 
   if (isRelative) {

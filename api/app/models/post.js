@@ -12,7 +12,7 @@ const post = class Post {
   static CreatePost(name, article, before, since) {
     const htmlHelper = new HtmlHelper(article);
 
-    const timestamp = dateHelper.convertFacebookDate(htmlHelper.getDateFromArticle().text());
+    const timestamp = dateHelper.convertFacebookDate(htmlHelper.getDateFromArticle().text(), before);
 
     if (!dateHelper.isBefore(timestamp, before) || !dateHelper.isAfter(timestamp, since)) {
       return null;

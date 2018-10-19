@@ -30,12 +30,19 @@ class App extends Component{
   }
 
   handleData(data) {
-    console.log(data)
     let result = JSON.parse(data.data);
+    console.log(result)
 
     this.setState(state => {
+      // filter to include only posts that don't already have a match in the existing posts
+      // this removes repeat messages which may be legitimate
+      const newPosts = result.posts.filter(newPost => {
+        return !state.posts.some(existingPost => {
+          return (newPost.content === existingPost.content && newPost.user === existingPost.user)
+        })
+      })
       return {
-        posts: [...result.posts, ...state.posts],
+        posts: [...newPosts, ...state.posts],
         got_posts_since: result.got_posts_since,
         got_posts_before: result.got_posts_before,
         websocket_state: state.websocket_state
